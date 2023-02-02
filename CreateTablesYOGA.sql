@@ -12,8 +12,8 @@ create table Customers
 (
 	CustomerID int not null IDENTITY(1, 1)
 		constraint PK_Customers_CustomerID primary key clustered,
-	First_Name char(50) not null,
-	Last_Name char(50) not null,
+	FirstName char(50) not null,
+	LastName char(50) not null,
 	Street char(50) not null,
 	City char(35) not null,
 	Province char(35) not null,
@@ -36,8 +36,8 @@ create table Contact
 		constraint PK_Contact_ContactID primary key clustered,
 	CustomerID int not null
 		constraint FK_Contact_CustomerID references Customers(CustomerID),
-	First_Name char(50) not null,
-	Last_Name char(50) not null,
+	FirstName char(50) not null,
+	LastName char(50) not null,
 	Phone_Number char(10) not null
 		constraint CK_Contact_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	Email char(50) not null
@@ -49,8 +49,8 @@ create table Staff
 (
 	StaffID int not null IDENTITY(1, 1)
 		constraint PK_Staff_StaffID primary key clustered,
-	First_Name char(50) not null,
-	Last_Name char(50) not null,
+	FirstName char(50) not null,
+	LastName char(50) not null,
 	Phone_Number char(10) not null
 		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	Email char(50) not null
@@ -96,8 +96,8 @@ create table Appointment
 		constraint PK_Appointment_BookingID primary key clustered,
 	CustomerID int null
 		constraint FK_Appointment_CustomerID references Customers(CustomerID),
-	First_Name char(50) not null,
-	Last_Name char(50) not null,
+	FirstName char(50) not null,
+	LastName char(50) not null,
 	Email char(50) not null
 		constraint CK_Appointment_Email check (Email like '%@%'),
 	TotalNumberOfParticipants int not null,
