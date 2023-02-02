@@ -26,10 +26,8 @@ create table Customers
 	/* Should phone number remain 10 digits?? People use different format when it comes to typing phone numbers  */
 	Email char(50) not null
 		constraint CK_Customers_Email check (Email like '%@%'),
-	Customer_Type char(50) not null,
 	Hobbies char(150) null,
-	Occupation char(100) null,
-	Interest char(100) null
+	Occupation char(100) null
 )
 
 create table Contact
@@ -145,24 +143,17 @@ create table IntakeForm
 (
 	FormID int not null IDENTITY(1, 1)
 		constraint PK_IntakeForm_FormID primary key clustered,
-	First_Name char(50) not null,
-	Last_Name char(50) not null,
-	Email char(50) not null
-		constraint CK_IntakeForm_Email check (Email like '%@%'),
-	Emer_First_Name char(50) not null,
-	Emer_Last_Name char(50) not null,
-	Relation char(20) not null,
-	Phone_Number char(10) not null
-		constraint CK_IntakeForm_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-	Hobbies char(150) not null,   
-	Goals char(50) not null,
-	Injuries char(150) not null,
-	HealthConcerns char(150) null,
+	CustomerID int not null
+		constraint FK_IntakeForm_CustomerID references Customers(CustomerID),
+	BookingID int not null
+		constraint FK_IntakeForm_BookingID references Appointment(BookingID),
+	Injuries char(150) null,   
+	HealthConcerns char(50) not null,
 	YogaInterests char(150) null,
-	RatePhysicalActivity char(12) not null, /* Should we just change this to int?? */
-	RateStress char(12) not null,   /* Should we just change this to int?? */
-	Comfortable_Self_Assessment char(12) not null,  /* Should we just change this to int?? */
-	Practice_Self_Assessment char(12) not null,  /* Should we just change this to int?? */
+	RatePhysicalActivity int not null, 
+	RateStress int not null,   
+	Comfortable_Self_Assessment int not null, 
+	Practice_Self_Assessment int not null,  
 	Health_conditions_Recently_Past char(150) null,
 	Concerns_Hopes_Goals_Anticipations char(150) null
 )

@@ -1,0 +1,45 @@
+Example on how to be able to add and display videos from MS SQL to website 
+
+https://www.c-sharpcorner.com/blogs/upload-video-file-audio-file-and-image-file-in-sql-server-db1
+
+Need to find a way which videos are avaliable to each person in database
+
+Create table Member
+(
+MemberID Int identity,    (PK)
+FirstName
+LastName
+......
+)
+
+Create table SharedVideos
+(
+SharedVideoID Int identity     (PK)
+MemberID Int (FK)
+VideoID
+)
+
+Create table Videos
+(
+ VideoID Int identity,     (PK)
+Video varbinary(MAX),
+Video_Name nvarchar(50),
+Video_Size bigint
+)
+
+For Uploading Videos we need varbinary(Max) to be able to upload videos  (Not sure if there is a limit)
+
+
+
+
+Need to share videos to each person seperately of choice
+
+Shared  Yoga Videos (Maybe need a different name)
+
+
+
+-    Needs to be able to have multiple videos per person if they manage to buy many
+-    Client needs to be able to pick which video(s) the person is able to view
+
+
+
