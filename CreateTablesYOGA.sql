@@ -190,7 +190,18 @@ DROP TABLE IF EXISTS Customers
 DROP TABLE IF EXISTS Appointment
 
 
-
+create table UserLogin
+(
+	UserLogID int not null IDENTITY(1, 1)
+		constraint PK_UserLogin_UserLogID primary key clustered,
+	Email varchar(350) not null
+		constraint CK_UserLogin_Email check (Email like '%@%'),
+	Password char(30) not null,
+		/* Make sure to hash password when inserting it into the database */
+	ActiveUser BIT not null
+		constraint DF_UserLogin_ActiveUser default 0
+		constraint CK_UserLogin_ActiveUser check (ActiveUser IN (1,0))
+)
 
 create table Customers
 (
