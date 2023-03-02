@@ -177,7 +177,7 @@
 Use MOYO_DB
 Go
 
-DROP TABLE IF EXISTS  Contact
+DROP TABLE IF EXISTS Contact
 DROP TABLE IF EXISTS Staff_Role
 DROP TABLE IF EXISTS Role
 DROP TABLE IF EXISTS Staff
@@ -190,7 +190,7 @@ DROP TABLE IF EXISTS Customers
 DROP TABLE IF EXISTS Appointment
 
 
-create table UserLogin
+create table LogIn
 (
 	UserLogID int not null IDENTITY(1, 1)
 		constraint PK_UserLogin_UserLogID primary key clustered,
@@ -244,8 +244,8 @@ create table Staff
 (
 	StaffID int not null IDENTITY(1, 1)
 		constraint PK_Staff_StaffID primary key clustered,
-	FirstName char(100) not null,
-	LastName char(100) not null,
+	FirstName char(150) not null,
+	LastName char(150) not null,
 	Phone_Number char(10) not null
 		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	Email char(350) not null
@@ -300,8 +300,8 @@ create table Appointment
 	LastName char(150) not null,
 	Email char(350) not null
 		constraint CK_Appointment_Email check (Email like '%@%'),	
-		WaiverSigned BIT not null,
-		witness null,
+	WaiverSigned BIT not null,
+	witness null,
 	CalenderID int not null
 		constraint FK_Appointment_CalenderID references Schedule(CalenderID),
 	Status char(50) not null
