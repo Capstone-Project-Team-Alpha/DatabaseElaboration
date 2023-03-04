@@ -163,64 +163,56 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 Use MOYO_DB
 Go
 
 DROP TABLE IF EXISTS Contact
 DROP TABLE IF EXISTS Staff_Role
 DROP TABLE IF EXISTS Role
-DROP TABLE IF EXISTS Staff
 DROP TABLE IF EXISTS Areas_Of_Concern
+DROP TABLE IF EXISTS IntakeForm
+DROP TABLE IF EXISTS GoalsInterests
 DROP TABLE IF EXISTS Goals
 DROP TABLE IF EXISTS Interests
-DROP TABLE IF EXISTS IntakeForm
-DROP TABLE IF EXISTS Schedule
-DROP TABLE IF EXISTS Customers
 DROP TABLE IF EXISTS Appointment
+DROP TABLE IF EXISTS Customers
+DROP TABLE IF EXISTS Schedule
+DROP TABLE IF EXISTS Staff
+DROP TABLE IF EXISTS LogIn
 
 
 create table LogIn
 (
-	UserLogID int not null IDENTITY(1, 1)
-		constraint PK_UserLogin_UserLogID primary key clustered,
 	Email varchar(350) not null
-		constraint CK_UserLogin_Email check (Email like '%@%'),
-	Password char(30) not null,
-		/* Make sure to hash password when inserting it into the database */
-	ActiveUser BIT not null
-		constraint DF_UserLogin_ActiveUser default 0
-		constraint CK_UserLogin_ActiveUser check (ActiveUser IN (1,0))
+		constraint PK_LogIn_Email primary key clustered,
+	Password varchar(250) not null,
+	ConfirmPassword varchar(250) not null,
+	CreatedDate date not null
+		constraint DF_LogIn_CreatedDate default getdate(),
+	LastModifiedDate date not null
+		constraint DF_LogIn_LastModifiedDate default getdate(),
+	failedLoginAttempts int null
+		constraint DF_LogIn_failedLoginAttempts default 0,
+	status tinyint not null
+		constraint DF_LogIn_Status default 1
+		constraint CK_LogIn_Status check (status IN (1,0))
 )
 
 create table Customers
 (
 	CustomerID int not null IDENTITY(1, 1)
 		constraint PK_Customers_CustomerID primary key clustered,
+	Email varchar(350) not null
+		constraint FK_Customers_Email references LogIn(Email),
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Street char(250) not null,
 	City char(200) not null,
 	Province char(100) not null,
 	PostalCode char(10) null,
-	/* not sure if i should put a check constraint on here?? we discussed US AND CANADA, How would we be able to establish states information ??? */
 	DateOfBirth date not null, 
-		/* constraint CK_Customer_DateOfBirth check (DateOfBirth)  waiting for client to send a response on age limit (> 18) */
 	Phone_Number char(10) not null
 		constraint CK_Customers_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-	/* Should phone number remain 10 digits?? People use different format when it comes to typing phone numbers  */
-	Email varchar(350) not null
-		constraint CK_Customers_Email check (Email like '%@%'),
 	Hobbies varchar(350) null,
 	Occupation varchar(300) null
 )
@@ -244,12 +236,12 @@ create table Staff
 (
 	StaffID int not null IDENTITY(1, 1)
 		constraint PK_Staff_StaffID primary key clustered,
+	Email varchar(350) not null
+		constraint FK_Staff_Email references LogIn(Email),
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Phone_Number char(10) not null
 		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-	Email char(350) not null
-		constraint CK_Staff_Email check (Email like '%@%'),
 	YearsOfExperience int not null
 )
 
@@ -277,15 +269,13 @@ create table Schedule
 (
 	CalenderID int not null IDENTITY(1, 1)
 		constraint PK_Schedule_CalenderID primary key clustered,
-		AppointmentDate date not null,
-	AppointmentStartDate time not null,
-	AppointmentEndDate time not null,
 	StaffID int not null
 		constraint FK_Schedule_StaffID references Staff(StaffID),
-		TotalNumberOfParticipants int not null,
-	/* added Staff Id and moved total number of participants from booking to schedule
-	*/
-	Status BIT not null
+	AppointmentDate date not null,
+	AppointmentStartDate time not null,
+	AppointmentEndDate time not null,
+	TotalNumberOfParticipants int not null,
+	Status tinyint not null
 		constraint DF_Schedule_Status default 0
 		constraint CK_Schedule_Status check (Status IN (1,0))
 )
@@ -296,14 +286,14 @@ create table Appointment
 		constraint PK_Appointment_BookingID primary key clustered,
 	CustomerID int null
 		constraint FK_Appointment_CustomerID references Customers(CustomerID),
+	CalenderID int not null
+		constraint FK_Appointment_CalenderID references Schedule(CalenderID),
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Email char(350) not null
 		constraint CK_Appointment_Email check (Email like '%@%'),	
-	WaiverSigned BIT not null,
-	witness null,
-	CalenderID int not null
-		constraint FK_Appointment_CalenderID references Schedule(CalenderID),
+	WaiverSigned tinyint not null,
+	witness char(300) null,
 	Status char(50) not null
 		constraint DF_Appointment_Status default 'Pending'
 )
@@ -340,33 +330,6 @@ create table Areas_Of_Concern
 		constraint CK_Areas_Of_Concern_Neck check (Neck IN (1,0))
 )
 
-create table Goals	
-(
-	ID int not null IDENTITY(1, 1)
-		constraint PK_GoalID primary key clustered,
-	GoalDescription VARCHAR(300) NOT NULL,
-	CreatedDate Date NOT NULL,
-	[LastModifiedDate] [date] NOT NULL)
-		ALTER TABLE [dbo].Goals ADD  CONSTRAINT [DF_Goals_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate]
-GO
-
-ALTER TABLE [dbo].Goals ADD  CONSTRAINT [DF_Goals_LastModifiedDate]  DEFAULT (getdate()) FOR [LastModifiedDate]
-GO
-
-	create table Interests	
-(
-	[ID] [int] IDENTITY(1,1) NOT NULL
-		constraint PK_InterestID primary key clustered,
-	[InterestDesc] [varchar](250) NOT NULL,
-	[CreatedDate] [date] NOT NULL,
-	[LastModifiedDate] [date] NOT NULL
-	)
-	ALTER TABLE [dbo].[Interests] ADD  CONSTRAINT [DF_Interests_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate]
-GO
-
-ALTER TABLE [dbo].[Interests] ADD  CONSTRAINT [DF_Interests_LastModifiedDate]  DEFAULT (getdate()) FOR [LastModifiedDate]
-GO
-
 create table IntakeForm
 (
 	IntakeFormID int not null IDENTITY(1, 1)
@@ -385,4 +348,38 @@ create table IntakeForm
 	Practice_Self_Assessment int not null,  
 	Health_conditions_Recently_Past TEXT null,
 	Concerns_Hopes_Goals_Anticipations TEXT null
+)
+
+create table Interests	
+(
+	InterestsID int IDENTITY(1,1) not null
+		constraint PK_Interests_InterestsID primary key clustered,
+	InterestDesc varchar(250) not null,
+	CreatedDate date not null
+		constraint DF_Interest_CreatedDate default getdate(),
+	LastModifiedDate date not null
+		constraint DF_Interest_LastModifiedDate default getdate()
+)
+
+create table Goals	
+(
+	GoalsID int not null IDENTITY(1, 1)
+		constraint PK_Goals_GoalID primary key clustered,
+	GoalDescription varchar(300) not null,
+	CreatedDate Date not null
+		constraint DF_Goals_CreatedDate default getdate(),
+	LastModifiedDate date NOT NULL
+		constraint DF_Goals_LastModifiedDate default getdate()
+)
+
+create table GoalsInterests
+(
+	GoalInterestsID int not null IDENTITY(1, 1)
+		constraint PK_GoalsInterests_GoalsInterestsID primary key clustered,
+	GoalsID int not null
+		constraint FK_GoalsInterests_GoalsID references Goals(GoalsID),
+	InterestsID int not null
+		constraint FK_GoalsInterests_InterestsID references Interests(InterestsID),
+	BookingID int not null
+		constraint FK_GoalsInterests_BookingID references Appointment(BookingID)
 )
