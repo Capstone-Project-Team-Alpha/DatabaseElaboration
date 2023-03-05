@@ -164,8 +164,8 @@
 
 
 Use MOYO_DB
-Go
 
+Go
 DROP TABLE IF EXISTS Contact
 DROP TABLE IF EXISTS Staff_Role
 DROP TABLE IF EXISTS Role
@@ -175,35 +175,24 @@ DROP TABLE IF EXISTS GoalsInterests
 DROP TABLE IF EXISTS Goals
 DROP TABLE IF EXISTS Interests
 DROP TABLE IF EXISTS Appointment
-DROP TABLE IF EXISTS Customers
 DROP TABLE IF EXISTS Schedule
-DROP TABLE IF EXISTS Staff
+DROP TABLE IF EXISTS CustomerLogIn
+DROP TABLE IF EXISTS StaffLogIn
 DROP TABLE IF EXISTS LogIn
+DROP TABLE IF EXISTS Customers
+DROP TABLE IF EXISTS Staff
 
 
-create table LogIn
-(
-	Email varchar(350) not null
-		constraint PK_LogIn_Email primary key clustered,
-	Password varchar(250) not null,
-	ConfirmPassword varchar(250) not null,
-	CreatedDate date not null
-		constraint DF_LogIn_CreatedDate default getdate(),
-	LastModifiedDate date not null
-		constraint DF_LogIn_LastModifiedDate default getdate(),
-	failedLoginAttempts int null
-		constraint DF_LogIn_failedLoginAttempts default 0,
-	status tinyint not null
-		constraint DF_LogIn_Status default 1
-		constraint CK_LogIn_Status check (status IN (1,0))
-)
+
+
+
+
 
 create table Customers
 (
 	CustomerID int not null IDENTITY(1, 1)
 		constraint PK_Customers_CustomerID primary key clustered,
-	Email varchar(350) not null
-		constraint FK_Customers_Email references LogIn(Email),
+	Email varchar(350) not null,
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Street char(250) not null,
@@ -215,6 +204,24 @@ create table Customers
 		constraint CK_Customers_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	Hobbies varchar(350) null,
 	Occupation varchar(300) null
+)
+create table CustomerLogIn
+(
+	Email varchar(350) not null
+		constraint PK_CustomerLogIn_Email primary key clustered,
+	CustomerID int not null
+	constraint FK_CustomerLogin_CustomerID references Customers(CustomerID),
+	Password varchar(250) not null,
+	--ConfirmPassword varchar(250) not null,
+	CreatedDate date not null
+		constraint DF_CustomerLogIn_CreatedDate default getdate(),
+	LastModifiedDate date not null
+		constraint DF_CustomerLogIn_LastModifiedDate default getdate(),
+	failedLoginAttempts int null
+		constraint DF_CustomerLogIn_failedLoginAttempts default 0,
+	status tinyint not null
+		constraint DF_CustomerLogIn_Status default 1
+		constraint CK_CustomerLogIn_Status check (status IN (1,0))
 )
 
 create table Contact
@@ -236,23 +243,38 @@ create table Staff
 (
 	StaffID int not null IDENTITY(1, 1)
 		constraint PK_Staff_StaffID primary key clustered,
-	Email varchar(350) not null
-		constraint FK_Staff_Email references LogIn(Email),
+	Email varchar(350) not null,
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Phone_Number char(10) not null
 		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	YearsOfExperience int not null
 )
-
+create table StaffLogIn
+(
+	Email varchar(350) not null,
+	StaffID int not null
+	constraint FK_StaffLogIn_StaffID references Staff(StaffID),
+	Password varchar(250) not null,
+	--ConfirmPassword varchar(250) not null,
+	CreatedDate date not null
+		constraint DF_StaffLogIn_CreatedDate default getdate(),
+	LastModifiedDate date not null
+		constraint DF_StaffLogIn_LastModifiedDate default getdate(),
+	failedLoginAttempts int null
+		constraint DF_StaffLogIn_failedLoginAttempts default 0,
+	status tinyint not null
+		constraint DF_StaffLogIn_Status default 1
+		constraint CK_StaffLogIn_Status check (status IN (1,0))
+)
 create table Role
 (
 	RoleID int not null IDENTITY(1, 1)
 		constraint PK_Role_RoleID primary key clustered,
 	RoleName char(150) not null,
 	Description char(255) not null,
-	CreatedBy int not null
-		constraint FK_Role_CreatedBy references Staff(StaffID)
+	CreatedBy char(250) not null
+		--constraint FK_Role_CreatedBy references Staff(StaffID)
 )
 
 create table Staff_Role	
@@ -277,7 +299,8 @@ create table Schedule
 	TotalNumberOfParticipants int not null,
 	Status tinyint not null
 		constraint DF_Schedule_Status default 0
-		constraint CK_Schedule_Status check (Status IN (1,0))
+		constraint CK_Schedule_Status check (Status IN (1,0)),
+	MaxParticipants int not null
 )
 
 create table Appointment
@@ -292,7 +315,8 @@ create table Appointment
 	LastName char(150) not null,
 	Email char(350) not null
 		constraint CK_Appointment_Email check (Email like '%@%'),	
-	WaiverSigned tinyint not null,
+	WaiverSigned tinyint not null
+	constraint CK_Appointment_WaiverSigned check (WaiverSigned IN (1,0)),
 	witness char(300) null,
 	Status char(50) not null
 		constraint DF_Appointment_Status default 'Pending'
@@ -334,8 +358,8 @@ create table IntakeForm
 (
 	IntakeFormID int not null IDENTITY(1, 1)
 		constraint PK_IntakeForm_FormID primary key clustered,
-	CustomerID int not null
-		constraint FK_IntakeForm_CustomerID references Customers(CustomerID),
+	--CustomerID int not null
+	--	constraint FK_IntakeForm_CustomerID references Customers(CustomerID),
 	BookingID int not null
 		constraint FK_IntakeForm_BookingID references Appointment(BookingID),
 	Injuries char(350) null,   
