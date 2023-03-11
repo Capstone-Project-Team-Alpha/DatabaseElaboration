@@ -123,8 +123,8 @@ create table Schedule
 	StaffID int not null
 		constraint FK_Schedule_StaffID references Staff(StaffID),
 	AppointmentDate date not null,
-	AppointmentStartDate time not null,
-	AppointmentEndDate time not null,
+	AppointmentStartTime time not null,
+	AppointmentEndTime time not null,
 	TotalNumberOfParticipants int not null,
 	MaxParticipants int not null,
 	Status tinyint not null
