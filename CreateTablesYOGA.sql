@@ -122,10 +122,12 @@ create table Schedule
 		constraint PK_Schedule_CalenderID primary key clustered,
 	StaffID int not null
 		constraint FK_Schedule_StaffID references Staff(StaffID),
+	AppointmentName char(350) not null,
 	AppointmentDate date not null,
 	AppointmentStartTime time not null,
 	AppointmentEndTime time not null,
-	TotalNumberOfParticipants int not null,
+	TotalNumberOfParticipants int not null
+		constraint DF_Schedule_TotalNumberOfParticipants default 0,
 	MaxParticipants int not null,
 	Status tinyint not null
 		constraint DF_Schedule_Status default 0
