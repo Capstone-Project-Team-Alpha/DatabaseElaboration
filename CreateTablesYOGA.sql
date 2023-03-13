@@ -146,6 +146,7 @@ create table Schedule
 	AppointmentDate date not null,
 	AppointmentStartTime time not null,
 	AppointmentEndTime time not null,
+	DurationMins int not null,
 	TotalNumberOfParticipants int not null
 		constraint DF_Schedule_TotalNumberOfParticipants default 0,
 	MaxParticipants int not null,
