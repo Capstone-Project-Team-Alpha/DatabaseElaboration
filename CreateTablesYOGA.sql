@@ -2,7 +2,7 @@ Use MOYO_DB
 
 Go
 DROP TABLE IF EXISTS Contact
-DROP TABLE IF EXISTS Staff_Role
+DROP TABLE IF EXISTS Instructor_Role
 DROP TABLE IF EXISTS Role
 DROP TABLE IF EXISTS Areas_Of_Concern
 DROP TABLE IF EXISTS IntakeForm
@@ -11,12 +11,20 @@ DROP TABLE IF EXISTS Goals
 DROP TABLE IF EXISTS Interests
 DROP TABLE IF EXISTS Appointment
 DROP TABLE IF EXISTS Schedule
+DROP TABLE IF EXISTS AppointmentName
 DROP TABLE IF EXISTS CustomerLogIn
-DROP TABLE IF EXISTS StaffLogIn
-DROP TABLE IF EXISTS LogIn
+DROP TABLE IF EXISTS InstructorLogIn
 DROP TABLE IF EXISTS Customers
-DROP TABLE IF EXISTS Staff
+DROP TABLE IF EXISTS Provinces
+DROP TABLE IF EXISTS Instructor
 
+create table Provinces
+(
+	ProvinceID int not null IDENTITY(1, 1)
+		constraint PK_Provinces_ProvinceID primary key clustered,
+	ProvinceName char(100) not null,
+	Abbreviation char(2) not null
+)
 
 create table Customers
 (
@@ -27,7 +35,8 @@ create table Customers
 	LastName char(150) not null,
 	Street char(250) not null,
 	City char(200) not null,
-	Province char(100) not null,
+	ProvinceID int not null
+		constraint FK_Customer_ProvinceID references Provinces(ProvinceID),
 	PostalCode char(10) null,
 	DateOfBirth date not null, 
 	Phone_Number char(10) not null
@@ -35,6 +44,7 @@ create table Customers
 	Hobbies varchar(350) null,
 	Occupation varchar(300) null
 )
+
 create table CustomerLogIn
 (
 	CustomerLoginID int not null IDENTITY(1, 1)
@@ -68,35 +78,37 @@ create table Contact
 	Relationship char(150) not null
 )
 
-create table Staff
+create table Instructor
 (
-	StaffID int not null IDENTITY(1, 1)
-		constraint PK_Staff_StaffID primary key clustered,
+	InstructorID int not null IDENTITY(1, 1)
+		constraint PK_Instructor_InstructorID primary key clustered,
 	Email varchar(350) not null,
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Phone_Number char(10) not null
-		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+		constraint CK_Instructor_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	YearsOfExperience int not null
 )
-create table StaffLogIn
+
+create table InstructorLogIn
 (
-	StaffLoginID int not null IDENTITY(1, 1)
-		constraint PK_StaffLogIn_StaffLoginID primary key clustered,
-	StaffID int not null
-		constraint FK_StaffLogIn_StaffID references Staff(StaffID),
+	InstructorLoginID int not null IDENTITY(1, 1)
+		constraint PK_InstructorLogIn_InstructorLoginID primary key clustered,
+	InstructorID int not null
+		constraint FK_InstructorLogIn_InstructorID references Instructor(InstructorID),
 	Email varchar(350) not null,
 	Password varchar(250) not null,
 	CreatedDate date not null
-		constraint DF_StaffLogIn_CreatedDate default getdate(),
+		constraint DF_InstructorLogIn_CreatedDate default getdate(),
 	LastModifiedDate date not null
-		constraint DF_StaffLogIn_LastModifiedDate default getdate(),
+		constraint DF_InstructorLogIn_LastModifiedDate default getdate(),
 	failedLoginAttempts int null
-		constraint DF_StaffLogIn_failedLoginAttempts default 0,
+		constraint DF_InstructorLogIn_failedLoginAttempts default 0,
 	status tinyint not null
-		constraint DF_StaffLogIn_Status default 1
-		constraint CK_StaffLogIn_Status check (status IN (1,0))
+		constraint DF_InstructorLogIn_Status default 1
+		constraint CK_InstructorLogIn_Status check (status IN (1,0))
 )
+
 create table Role
 (
 	RoleID int not null IDENTITY(1, 1)
@@ -106,23 +118,31 @@ create table Role
 	CreatedBy char(250) not null
 )
 
-create table Staff_Role	
+create table Instructor_Role	
 (
-	StaffRoleID int not null IDENTITY(1, 1)
-		constraint PK_StaffRole_StaffRoleID primary key clustered,
-	StaffID int not null
-		constraint FK_StaffRole_StaffID references Staff(StaffID),
+	InstructorRoleID int not null IDENTITY(1, 1)
+		constraint PK_Instructor_Role_InstructorRoleID primary key clustered,
+	InstructorID int not null
+		constraint FK_Instructor_Role_InstructorID references Instructor(InstructorID),
 	RoleID int not null
-		constraint FK_StaffRole_RoleID references Role(RoleID)
+		constraint FK_Instructor_Role_RoleID references Role(RoleID)
+)
+
+create table AppointmentName
+(
+	AppointmentNameID int not null IDENTITY(1,1)
+		constraint PK_AppointmentName_AppointmentNameID primary key clustered,
+	AppointmentName char(350) not null
 )
 
 create table Schedule
 (
 	CalenderID int not null IDENTITY(1, 1)
 		constraint PK_Schedule_CalenderID primary key clustered,
-	StaffID int not null
-		constraint FK_Schedule_StaffID references Staff(StaffID),
-	AppointmentName char(350) not null,
+	InstructorID int not null
+		constraint FK_Schedule_InstructorID references Instructor(InstructorID),
+	AppointmentNameID int not null
+		constraint FK_Schedule_AppointmentNameID references AppointmentName(AppointmentNameID),
 	AppointmentDate date not null,
 	AppointmentStartTime time not null,
 	AppointmentEndTime time not null,
@@ -235,3 +255,20 @@ create table GoalsInterests
 	BookingID int not null
 		constraint FK_GoalsInterests_BookingID references Appointment(BookingID)
 )
+
+go
+
+INSERT INTO Provinces (ProvinceName, Abbreviation)
+VALUES('Alberta', 'AB'),
+	  ('British Columbia', 'BC'),
+      ('Manitoba', 'MB'),
+      ('New Brunswick', 'NB'),
+      ('Newfoundland and Labrador', 'NL'),
+      ('Northwest Territories', 'NT'),
+      ('Nova Scotia', 'NS'),
+      ('Nunavut', 'NU'),
+      ('Ontario', 'ON'),
+      ('Prince Edward Island', 'PE'),
+      ('Quebec', 'QC'),
+      ('Saskatchewan', 'SK'),
+      ('Yukon', 'YT');
