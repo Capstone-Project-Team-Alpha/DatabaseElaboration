@@ -2,7 +2,7 @@ Use MOYO_DB
 
 Go
 DROP TABLE IF EXISTS Contact
-DROP TABLE IF EXISTS Instructor_Role
+DROP TABLE IF EXISTS Staff_Role
 DROP TABLE IF EXISTS Role
 DROP TABLE IF EXISTS Areas_Of_Concern
 DROP TABLE IF EXISTS IntakeForm
@@ -13,10 +13,10 @@ DROP TABLE IF EXISTS Appointment
 DROP TABLE IF EXISTS Schedule
 DROP TABLE IF EXISTS AppointmentName
 DROP TABLE IF EXISTS CustomerLogIn
-DROP TABLE IF EXISTS InstructorLogIn
+DROP TABLE IF EXISTS StaffLogIn
 DROP TABLE IF EXISTS Customers
 DROP TABLE IF EXISTS Provinces
-DROP TABLE IF EXISTS Instructor
+DROP TABLE IF EXISTS Staff
 
 create table Provinces
 (
@@ -78,35 +78,35 @@ create table Contact
 	Relationship char(150) not null
 )
 
-create table Instructor
+create table Staff
 (
-	InstructorID int not null IDENTITY(1, 1)
-		constraint PK_Instructor_InstructorID primary key clustered,
+	StaffID int not null IDENTITY(1, 1)
+		constraint PK_Staff_StaffID primary key clustered,
 	Email varchar(350) not null,
 	FirstName char(150) not null,
 	LastName char(150) not null,
 	Phone_Number char(10) not null
-		constraint CK_Instructor_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	YearsOfExperience int not null
 )
 
-create table InstructorLogIn
+create table StaffLogIn
 (
-	InstructorLoginID int not null IDENTITY(1, 1)
-		constraint PK_InstructorLogIn_InstructorLoginID primary key clustered,
-	InstructorID int not null
-		constraint FK_InstructorLogIn_InstructorID references Instructor(InstructorID),
+	StaffLoginID int not null IDENTITY(1, 1)
+		constraint PK_StaffLogIn_StaffLoginID primary key clustered,
+	StaffID int not null
+		constraint FK_StaffLogIn_StaffID references Staff(StaffID),
 	Email varchar(350) not null,
 	Password varchar(250) not null,
 	CreatedDate date not null
-		constraint DF_InstructorLogIn_CreatedDate default getdate(),
+		constraint DF_StaffLogIn_CreatedDate default getdate(),
 	LastModifiedDate date not null
-		constraint DF_InstructorLogIn_LastModifiedDate default getdate(),
+		constraint DF_StaffLogIn_LastModifiedDate default getdate(),
 	failedLoginAttempts int null
-		constraint DF_InstructorLogIn_failedLoginAttempts default 0,
+		constraint DF_StaffLogIn_failedLoginAttempts default 0,
 	status tinyint not null
-		constraint DF_InstructorLogIn_Status default 1
-		constraint CK_InstructorLogIn_Status check (status IN (1,0))
+		constraint DF_StaffLogIn_Status default 1
+		constraint CK_StaffLogIn_Status check (status IN (1,0))
 )
 
 create table Role
@@ -118,14 +118,14 @@ create table Role
 	CreatedBy char(250) not null
 )
 
-create table Instructor_Role	
+create table Staff_Role	
 (
-	InstructorRoleID int not null IDENTITY(1, 1)
-		constraint PK_Instructor_Role_InstructorRoleID primary key clustered,
-	InstructorID int not null
-		constraint FK_Instructor_Role_InstructorID references Instructor(InstructorID),
+	StaffRoleID int not null IDENTITY(1, 1)
+		constraint PK_Staff_Role_StaffRoleID primary key clustered,
+	StaffID int not null
+		constraint FK_Staff_Role_StaffID references Staff(StaffID),
 	RoleID int not null
-		constraint FK_Instructor_Role_RoleID references Role(RoleID)
+		constraint FK_Staff_Role_RoleID references Role(RoleID)
 )
 
 create table AppointmentName
@@ -139,8 +139,8 @@ create table Schedule
 (
 	CalenderID int not null IDENTITY(1, 1)
 		constraint PK_Schedule_CalenderID primary key clustered,
-	InstructorID int not null
-		constraint FK_Schedule_InstructorID references Instructor(InstructorID),
+	StaffID int not null
+		constraint FK_Schedule_StaffID references Staff(StaffID),
 	AppointmentNameID int not null
 		constraint FK_Schedule_AppointmentNameID references AppointmentName(AppointmentNameID),
 	AppointmentDate date not null,
@@ -273,3 +273,12 @@ VALUES('Alberta', 'AB'),
       ('Quebec', 'QC'),
       ('Saskatchewan', 'SK'),
       ('Yukon', 'YT');
+
+INSERT INTO AppointmentName (AppointmentName)
+VALUES('Guided Meditation'),
+	  ('Myofascial Release'),
+	  ('Chakra education'),
+	  ('Asana'),
+	  ('Mantra'),
+	  ('Nidra'),
+	  ('Partner Yoga')
