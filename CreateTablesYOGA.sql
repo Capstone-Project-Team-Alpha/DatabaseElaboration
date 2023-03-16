@@ -87,7 +87,13 @@ create table Staff
 	LastName char(150) not null,
 	Phone_Number char(10) not null
 		constraint CK_Staff_PhoneNumber check (Phone_Number like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
-	YearsOfExperience int not null
+	YearsOfExperience int not null,
+	HomeAddress text not null,
+	HomePostalCode char(10) not null,
+	HomeProvince varchar(150) not null,
+	HomeCity varchar(150) not null,
+	CreatedDate date not null,
+	Status tinyint not null
 )
 
 create table StaffLogIn
@@ -231,7 +237,9 @@ create table Interests
 	CreatedDate date not null
 		constraint DF_Interest_CreatedDate default getdate(),
 	LastModifiedDate date not null
-		constraint DF_Interest_LastModifiedDate default getdate()
+		constraint DF_Interest_LastModifiedDate default getdate(),
+	Status tinyint not null
+		constraint DF_Interests_Status default 0
 )
 
 create table Goals	
@@ -242,7 +250,9 @@ create table Goals
 	CreatedDate Date not null
 		constraint DF_Goals_CreatedDate default getdate(),
 	LastModifiedDate date NOT NULL
-		constraint DF_Goals_LastModifiedDate default getdate()
+		constraint DF_Goals_LastModifiedDate default getdate(),
+	Status tinyint not null
+		constraint DF_Interests_Status default 0
 )
 
 create table GoalsInterests
